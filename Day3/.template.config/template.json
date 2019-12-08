@@ -1,0 +1,12 @@
+{
+    "$schema": "http://json.schemastore.org/template",
+    "author": "Roelof Briers",
+    "classifications": [ "Common", "Console", "C#8" ],
+    "identity": "Advent of Code Project",
+    "name": "Advent of Code Project",
+    "shortName": "advent",
+    "tags": {
+      "language": "C#",
+      "type": "project"
+    }
+  }
