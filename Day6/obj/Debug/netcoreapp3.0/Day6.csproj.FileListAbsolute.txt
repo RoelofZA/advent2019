@@ -1,0 +1,11 @@
+/Users/roelofbriers/Projects/Advent2019/Day6/bin/Debug/netcoreapp3.0/Day6
+/Users/roelofbriers/Projects/Advent2019/Day6/bin/Debug/netcoreapp3.0/Day6.deps.json
+/Users/roelofbriers/Projects/Advent2019/Day6/bin/Debug/netcoreapp3.0/Day6.runtimeconfig.json
+/Users/roelofbriers/Projects/Advent2019/Day6/bin/Debug/netcoreapp3.0/Day6.runtimeconfig.dev.json
+/Users/roelofbriers/Projects/Advent2019/Day6/bin/Debug/netcoreapp3.0/Day6.dll
+/Users/roelofbriers/Projects/Advent2019/Day6/bin/Debug/netcoreapp3.0/Day6.pdb
+/Users/roelofbriers/Projects/Advent2019/Day6/obj/Debug/netcoreapp3.0/Day6.csprojAssemblyReference.cache
+/Users/roelofbriers/Projects/Advent2019/Day6/obj/Debug/netcoreapp3.0/Day6.AssemblyInfoInputs.cache
+/Users/roelofbriers/Projects/Advent2019/Day6/obj/Debug/netcoreapp3.0/Day6.AssemblyInfo.cs
+/Users/roelofbriers/Projects/Advent2019/Day6/obj/Debug/netcoreapp3.0/Day6.dll
+/Users/roelofbriers/Projects/Advent2019/Day6/obj/Debug/netcoreapp3.0/Day6.pdb
