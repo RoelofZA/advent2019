@@ -11,117 +11,132 @@ namespace Day14
     {
         static void Main(string[] args)
         {
-            string contentsMain = File.ReadAllText(Environment.CurrentDirectory + "/puzzle3.txt");
-            int oreTotal = 0;
+            //Miner(File.ReadAllText(Environment.CurrentDirectory + "/puzzle1.txt"));
+            //Miner(File.ReadAllText(Environment.CurrentDirectory + "/puzzle2.txt"));
+            //Miner(File.ReadAllText(Environment.CurrentDirectory + "/puzzle3.txt"));
+            //Miner(File.ReadAllText(Environment.CurrentDirectory + "/puzzle4.txt"));
+            //Miner(File.ReadAllText(Environment.CurrentDirectory + "/puzzle5.txt"));
+            Miner(File.ReadAllText(Environment.CurrentDirectory + "/puzzle6.txt"));
+        }
+
+        public static void Miner(string contentsMain) {
 
             Hashtable ht = new Hashtable();
+            Hashtable elementHash = new Hashtable();
+            Hashtable spare = new Hashtable();
 
-            //Build hashtable
+            //Build hashtable of Functions
             foreach (string item in contentsMain.Split("\n"))
             {
                 string[] splitStr = item.Split(" => ");
                 ht.Add(splitStr[1].Split(" ")[1],splitStr);
             }
 
-            Hashtable sumTableZ = new Hashtable();
-            Hashtable elementHash = new Hashtable();
-            Hashtable excess = new Hashtable();
+            string BuildFormula(string nameElement, int multiply=1) {
+                string[] splitStr= (string[])ht[nameElement];
 
-            string BuildCalc(string nameElement, int multiply = 1) {
-                string formula = "";
-                string[] splitStr = (string[])ht[nameElement];
+                if (splitStr==null)
+                    return nameElement;
 
-                
-                //Console.WriteLine(String.Join(",",splitStr));
-                
-                //Console.WriteLine(splitStr[0]);
-                formula = splitStr[0];
+                string newFormula = splitStr[0];
+                string[] formulaSplit = newFormula.Split(", ");
 
-                if (!formula.Contains("ORE"))
-                    Console.WriteLine($"{splitStr[1].Split(" ")[0]} {nameElement} = {formula} Multiply {multiply}");
-
-                decimal diff = decimal.Parse(splitStr[1].Split(" ")[0]);
-                multiply = (int)Math.Ceiling((decimal)multiply / diff);
-                
-                string[] formulaSplit = formula.Split(", ");
-
-                for (int i = 0; i < formulaSplit.Length; i++)
-                {
-                    string subItem = formulaSplit[i].Split(" ")[1];
-
-                    string[] str = formulaSplit[i].Split(" ");
-                    int val = int.Parse(str[0])*multiply;
-
-                    if (subItem=="ORE"){              
-                        oreTotal += val;
-                        continue;
-                    }
-                        
-
-                    // Add to Part List
-                    
-                    
-                    sumTableZ[str[1]] = sumTableZ.ContainsKey(str[1])?(int)sumTableZ[str[1]]+val:val;
-
-                    string tmp = BuildCalc(subItem, val);
-
-                    //Console.WriteLine($"{str[1]} {val}  -- {subItem} -- {(tmp.EndsWith("ORE")?"ORE":"")} {sumTableZ[str[1]]}");
-                    
-                    formulaSplit[i] = tmp.EndsWith("ORE")?formulaSplit[i]: tmp;
-                    
-                }
-
-                return String.Join(",",formulaSplit);
-            }
-
-            string BuildCalc2(string nameElement, int multiply = 1, bool goDeep = false) {
-                string[] splitStr = (string[])ht[nameElement];
-                string formula = splitStr[0], newFormula = "";
-                string[] formulaSplit = formula.Split(", ");
-                int multiOld = multiply;
-            
-                for (int i = 0; i < formulaSplit.Length; i++)
-                {
-                    string[] str = formulaSplit[i].Split(" ");
-                    string subItem = str[1];
-                    int val = int.Parse(str[0])*multiply;
-
-                    if (subItem != "ORE") {
-                        if (!((string[])ht[subItem])[0].Contains("ORE")) {
-                            newFormula += BuildCalc2(subItem, val, true);
-                        }
-                        else {
-                            newFormula +=  $"{subItem} {val}, ";
-                            elementHash[subItem] = elementHash.ContainsKey(subItem)?(int)elementHash[subItem]+val:val;
-                        }
-                    }
-                    else
+                    formulaSplit = newFormula.Split(", ");
+                    newFormula = "";
+                    for (int i = 0; i < formulaSplit.Length; i++)
                     {
-                        newFormula +=  $"{subItem} {val}, ";
+                        string[] str = formulaSplit[i].Split(" ");
+                        string subItem = str[1];
+                        int val = int.Parse(str[0]) * multiply;
+
+                        if (!str.Contains("ORE")) {
+                             string[] subElement = (string[])ht[subItem];
+                             string[] subElementB = subElement[1].Split(" ");
+
+                             if (subElement[0].Contains("ORE")){
+                                newFormula +=  $"{val} {subElementB[1]} + ";
+                                elementHash[subElementB[1]] = elementHash.ContainsKey(subElementB[1])?(int)elementHash[subElementB[1]]+val:val;
+                             }
+                             else{
+                                if(!spare.ContainsKey(subItem))
+                                    spare[subItem] = 0;
+
+                                int spares = (int)spare[subItem];
+
+                                if (val>spares)
+                                {
+                                    int divResult = Math.DivRem(val, int.Parse(subElementB[0].ToString()), out int resVal);
+                                    
+                                    if (resVal!=0){
+                                        if (resVal<=spares)
+                                        {
+                                            spare[subItem] = (int)spare[subItem] - resVal;
+                                        }
+                                        else
+                                        {
+                                            divResult++;
+                                            resVal = (divResult*int.Parse(subElementB[0].ToString())) - (val-spares);
+                                            spare[subItem] = resVal;      
+                                        }                           
+                                    }
+                                    newFormula +=  $"{BuildFormula(subItem, divResult)}";
+                                }
+                                else
+                                {
+                                    spare[subItem] = (int)spare[subItem] - val;
+                                }
+                             }
+                        }
+                        else
+                        {
+                            newFormula +=  $"{subItem} {val}, ";
+                        }
                     }
-                }
                 return newFormula;
             }
 
+            decimal totalOre = 0, counter = 0;
 
-
-            string baseFormula = BuildCalc2("FUEL", goDeep: true);
-            Console.WriteLine(baseFormula);
-            Hashtable sumTable = new Hashtable();
-
-            int totalOre = 0;
-
-            foreach (var item in elementHash.Keys)
+            while(totalOre<1000000000000) 
             {
-                string[] totalSplit = elementHash[item].ToString().Split(" ");
-                string[] splitStr = (string[])ht[item];
+                counter++;
+                elementHash = new Hashtable();
+                string baseFormula = BuildFormula("FUEL");
+                //Console.WriteLine(baseFormula);
+                Hashtable sumTable = new Hashtable();
 
-                decimal xx = Math.Ceiling(decimal.Parse(totalSplit[0]) / decimal.Parse(splitStr[1].Split(" ")[0]));
-                totalOre += (int)xx*int.Parse(splitStr[0].Split(" ")[0]);
+                foreach (var item in elementHash.Keys)
+                {
+                    string[] totalSplit = elementHash[item].ToString().Split(" ");
+                    string[] splitStr = (string[])ht[item];
+
+                    string splitKey = splitStr[1].Split(" ")[1];
+                    if(!spare.ContainsKey(splitKey))
+                        spare[splitKey] = 0;
+
+                    int spares = (int)spare[splitKey];
+
+                    int divResult = Math.DivRem(int.Parse(totalSplit[0]), int.Parse(splitStr[1].Split(" ")[0]), out int resVal);
+                                    
+                    if (resVal!=0){
+                        if (resVal<=spares)
+                        {
+                            spare[splitKey] = (int)spare[splitKey] - resVal;
+                        }
+                        else
+                        {
+                            divResult++;
+                            resVal = (divResult*int.Parse(splitStr[1].Split(" ")[0])) - (int.Parse(totalSplit[0])-spares);
+                            spare[splitKey] = resVal;      
+                        }                           
+                    }
+
+                    totalOre += (int)divResult*int.Parse(splitStr[0].Split(" ")[0]);
+                }
             }
-            
 
-            Console.WriteLine (totalOre);
+            Console.WriteLine($" {totalOre} - {counter}");
+            Console.WriteLine($" -1000000000000 - {counter}");
         }
     }
 }
