@@ -354,9 +354,4 @@ healthchecksdb
 MigrationBackup/
 
 # End of https://www.gitignore.io/api/csharp
-.vscode/launch.json
-.vscode/tasks.json
-.vscode/tasks.json
-.vscode/launch.json
-.vscode/launch.json
-.vscode/tasks.json
+.vscode/
