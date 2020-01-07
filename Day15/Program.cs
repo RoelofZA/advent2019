@@ -8,6 +8,7 @@ using System.Diagnostics;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using ImageMagick;
+using SkiaSharp;
 
 
 namespace Day15
@@ -32,54 +33,75 @@ namespace Day15
 
         }
 
-        public static void DrawBoard(Hashtable ht, PointF current, string displayText = "0")
-        {
-            decimal[,] array = new decimal[100, 100];
+        public static void DrawBoard(Hashtable ht, PointF current, string displayText = "0") {
+            // crate a surface
+			var info = new SKImageInfo(500, 500);
+			using (var surface = SKSurface.Create(info))
+			{
+				// the the canvas and properties
+				var canvas = surface.Canvas;
 
-            // Create a Bitmap object from a file.
-            using (MagickImage image = new MagickImage(new MagickColor("white"), 200, 200))
-            {
+				// make sure the canvas is blank
+				canvas.Clear(SKColors.White);
+
+				// draw some text
+				var paint = new SKPaint
+				{
+					Color = SKColors.Black,
+					IsAntialias = true,
+					Style = SKPaintStyle.Fill
+				};
+
+                SKPoint coord;
+
                 foreach (PointF point in ht.Keys)
                 {
-                    var colour = MagickColors.Red;
+                    var colour = SKColors.Purple;
 
                     switch ((decimal)ht[point])
                     {
                         case 0:
-                            colour = MagickColors.Red;
+                            colour = SKColors.Red;
                             break;
                         case 1:
-                            colour = MagickColors.Green;
+                            colour = SKColors.Green;
                             break;
                         case 3:
-                            colour = MagickColors.Yellow;
+                            colour = SKColors.Yellow;
                             break;
                         default:
-                            colour = MagickColors.Purple;
+                            colour = SKColors.Purple;
                             break;
                     }
-
-                    image.Draw(new Drawables()
-                        .FillColor(colour)
-                        .StrokeWidth(1)
-                        .Rectangle(100 + (int)point.X * 2, 100 - (int)point.Y * 2, 100 + (int)point.X * 2 + 1, 100 - (int)point.Y * 2 - 1));
+                    paint.Color = colour;
+                    coord = new SKPoint(250 + (int)point.X * 10, 250 - (int)point.Y * 10);
+                    canvas.DrawRect(coord.X, coord.Y, 9, -9, paint);
                 }
 
-                image.Draw(new Drawables()
-                                        .FillColor(MagickColors.Blue)
-                                        .Rectangle(100 + (int)current.X * 2, 100 - (int)current.Y * 2, 100 + (int)current.X * 2 + 1, 100 - (int)current.Y * 2 - 1));
+                paint.Color = SKColors.Blue;
+                coord = new SKPoint(250 + (int)current.X * 2, 250 - (int)current.Y * 2);
+                canvas.DrawRect(coord.X, coord.Y, 1, -1, paint);
 
-                // image.Draw(new Drawables()
-                //                 // Draw text on the image
-                //                 .FontPointSize(30)
-                //                 //.Font("Comic Sans")
-                //                 .StrokeColor(new MagickColor("Black"))
-                //                 .FillColor(MagickColors.Black)
-                //                 .TextAlignment(TextAlignment.Left)
-                //                 .Text(0, 20, displayText)
-                // );
-                
-                image.Write(@"board.png");
+
+                paint = new SKPaint
+				{
+					Color = SKColors.Black,
+					IsAntialias = true,
+					Style = SKPaintStyle.Fill,
+					TextAlign = SKTextAlign.Left,
+					TextSize = 24
+				};
+
+                coord = new SKPoint(10, 20);
+                canvas.DrawText(displayText, coord, paint);
+
+				// save the file
+				using (var image = surface.Snapshot())
+				using (var data = image.Encode(SKEncodedImageFormat.Png, 100))
+				using (var stream = File.OpenWrite("output.png"))
+				{
+					data.SaveTo(stream);
+				}
             }
         }
 
@@ -282,7 +304,7 @@ namespace Day15
 
                         ht[tmpSwap] = val1;
                         if (val1 > 0) current = tmpSwap; ;
-                        if (ht.Keys.Count % 50 == 0) DrawBoard(ht, current);
+                        if (ht.Keys.Count % 20 == 0) DrawBoard(ht, current);
 
                         switch (val1)
                         {
