@@ -1,0 +1,10 @@
+A,B,C,B,D,E,F,E,G,B,H,
+
+A = R4,R11,L9,
+B = R5,R11,
+C = R7,L5
+D = R9,L5,R11,
+E = R7,R5,
+F = L5,L13,L7,L13,L11,
+G = R5,R13,R7,R13,R5,L11,R9,
+H = L7,R5,R5,L13,R7,L13,
